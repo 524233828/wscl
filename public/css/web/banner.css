@@ -1,0 +1,22 @@
+.banner {
+    width: 100%;
+    height: auto;
+}
+
+.banner img{
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+}
+
+.slideBox{ width:100%; height:auto; overflow:hidden; position:relative;  }
+.slideBox .hd{ width:100%; overflow:hidden; position:absolute; right:5px; bottom:5px; z-index:1; }
+.slideBox .hd ul{ overflow:hidden; zoom:1; float:left;  width: 100%;}
+.slideBox .hd ul li{ float:left; width:7%; margin: 1%; height:auto; text-align:center; cursor:pointer;}
+/*.slideBox .hd ul{ overflow:hidden; zoom:1; float:left; width: 100%; text-align: center;}*/
+/*.slideBox .hd ul li{ float:left; width:7%;margin: 1%; text-align: center}*/
+.slideBox .hd ul li img{ width:100%; height:auto; }
+.slideBox .hd ul li.on{ border: 1px solid #e8e8e8 }
+.slideBox .bd{ position:relative; height:100%; z-index:0; }
+.slideBox .bd li{ zoom:1; vertical-align:middle; }
+.slideBox .bd img{  width:100%; height:auto; display:block;  }

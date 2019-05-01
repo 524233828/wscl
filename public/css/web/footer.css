@@ -1,0 +1,124 @@
+.footer{
+    background-color: #5397e2;
+    padding: 38px 18.75%;
+    width: 62.5%;
+    height: 215px;
+    float: left;
+}
+
+.footer .bar {
+    height: 68px;
+    border-bottom: 1px solid #FFFFFF;
+    width: 100%;
+    float: left;
+}
+
+.footer .bar .title{
+    font-size: 28px;
+    color: #FFFFFF;
+    line-height: 68px;
+    float: left;
+}
+
+.footer .operation {
+    /*float: left;*/
+    font-size: 11px;
+    line-height: 51px;
+    margin-top: 17px;
+    margin-left: 1.1%;
+}
+
+.footer .operation a:link{
+    color: #FFFFFF;
+}
+
+.footer .operation a:active{
+    color: #FFFFFF;
+}
+
+.footer .operation a:visited{
+    color: #FFFFFF;
+}
+
+.footer .operation a:hover{
+    color: #CCCCCC;
+}
+
+.footer .operation a{
+    padding: 0 2.3%;
+    color: #FFFFFF;
+    border-right: 1px #FFFFFF solid;
+}
+
+.footer .content{
+    margin: 20px 0;
+    padding: 0;
+    height: auto;
+    /*margin-bottom: 20px;*/
+    float: left;
+    width: 100%;
+    height: 106px;
+}
+
+.footer .content .block{
+    width: 30%;
+    float: left;
+    height: 100%;
+}
+
+.footer .content .block .qrcode{
+    float: left;
+    width: 100%;
+    text-align: end;
+}
+
+.footer .content .block .qrcode .info{
+    position: relative;
+    top: 130%;
+    float: left;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 66.5%;
+    height: 100%;
+    line-height: 220%;
+    font-size: 12px;
+}
+
+.footer .content .block .qrcode img{
+    width: 33.5%;
+
+}
+
+.footer .content .block .info{
+    text-align: center;
+    float: left;
+    height: 100%;
+    width: 66.5%;
+    line-height: 35px;
+    color: #FFFFFF;
+}
+
+.footer .content .block .title{
+    width: 95%;
+    padding-left: 5%;
+    background-image: url("/images/footer-title.png");
+    background-repeat: no-repeat;
+    font-size: 18px;
+    color: #5397e2;
+    line-height: 42px;
+    height: 40px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #5397e2;
+    margin-bottom: 14px;
+}
+
+.footer .content .block .link-group{
+    color: #FFFFFF;
+}
+
+@media (max-width: 1240px){
+    .footer .content .block{
+        display: none;
+    }
+}

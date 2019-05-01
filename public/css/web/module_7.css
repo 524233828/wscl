@@ -1,0 +1,61 @@
+.module-group .module-7{
+    float: left;
+    background-color: #F6F6F6;
+    margin-bottom: 16px;
+    padding: 16px 3%;
+}
+
+.module-group .module-7 .title{
+    width: 95%;
+    padding-left: 5%;
+    background-image: url("/images/module-7-title.png");
+    background-repeat: no-repeat;
+    font-size: 18px;
+    color: #FFFFFF;
+    line-height: 42px;
+    height: 40px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #FF9900;
+    margin-bottom: 14px;
+}
+
+.module-group .module-7 .service-group .service{
+    width: 27.3%;
+    padding: 0px 3%;
+    float: left;
+    margin: 14px 0;
+    color: #999999;
+    font-size: 13px;
+    text-align: center;
+}
+
+.module-group .module-7 .service-group .service img{
+    width: 100%;
+}
+
+@media (min-width: 1412px) {
+    .module-group .module-7{
+        height: 454px;
+        width: 27.08%;
+    }
+
+    .module-group .module-7 .service-group{
+        width: 95%;
+        padding: 0 5%;
+    }
+
+}
+
+
+@media (max-width: 1411px) {
+    .module-group .module-7{
+        width: 94%;
+    }
+
+    .module-group .module-7 .service-group{
+        width: 33.3%;
+        padding: 0;
+        float: left;
+    }
+
+}

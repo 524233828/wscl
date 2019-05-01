@@ -1,0 +1,17 @@
+.module-1 {
+    /*width: 40%;*/
+    width: 355px;
+    height: auto;
+}
+
+.module-1 img {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 1360px) {
+    .module-1{
+        width: 0px;
+        display: none;
+    }
+}

@@ -1,0 +1,23 @@
+.module-group .module-10{
+    width: 66%;
+    background-color: #FFFFFF;
+    border: 1px solid #e8e8e8;
+    height: auto;
+    padding: 29px 1.75%;
+    float: left;
+    margin-left: 1%;
+}
+
+.module-10 .title{
+    width: 95%;
+    padding-left: 5%;
+    background-image: url("/images/module-8-title.png");
+    background-repeat: no-repeat;
+    font-size: 18px;
+    color: #FFFFFF;
+    line-height: 42px;
+    height: 40px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #5397e2;
+    margin-bottom: 14px;
+}

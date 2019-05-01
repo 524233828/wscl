@@ -1,0 +1,141 @@
+.header{
+    height: 131px;
+    background-color: #FFFFFF;
+    padding: 0 18.75% 0 18.75%;
+}
+
+.header .title-group .title{
+    font-size: 28px;
+    color: #3399ff;
+    float: left;
+    height: 131px;
+    line-height: 131px;
+    font-family: "Microsoft Sans Serif";
+    margin-right: 0.89%;
+}
+
+.header .title-group .sub_title{
+    height: 131px;
+    float: left;
+    /*padding:  0 0 0;*/
+}
+
+.header .title-group .sub_title .cn{
+    font-size: 22px;
+    color: #999999;
+    line-height: 131px;
+    font-family: "Microsoft Sans Serif";
+}
+
+.header .title-group .sub_title .site{
+    font-size: 16px;
+    color: #999999;
+    padding-left: 17px;
+    font-family: "Microsoft Sans Serif";
+    text-align: right;
+    /*float: outside;*/
+    position: relative;
+    bottom: 40%;
+}
+
+.header .date-time{
+    font-size: 15px;
+    color: #999999;
+    float: left;
+    height: 110px;
+    padding: 21px  0 0 1%;
+    width: 23.42%;
+    line-height: 110px;
+}
+
+.header .title-group{
+    float: left;
+}
+
+.header .other .operation{
+    font-size: 12px;
+    /*color: #999;*/
+    padding: 30px 0 6px 0;
+    height : 24px;
+}
+
+.header .other .operation a:link{
+    color: #999;
+}
+
+.header .other .operation a:active{
+    color: #999;
+}
+
+.header .other .operation a:visited{
+    color: #999;
+}
+
+.header .other .operation a:hover{
+    color: #333;
+}
+
+.header .other .search input{
+    height : 12px;
+    font-size: 12px;
+    padding: 8px 0px 8px 10px;
+    border: 1px solid #999;
+    border-radius: 1px;
+    float: left;
+}
+
+.header .other .search button{
+    width: 29px;
+    height: 29px;
+    float: left;
+}
+
+.header .other .search button img{
+    width: 100%;
+}
+
+@media (min-width: 1441px) {
+
+
+    .header .title-group{
+        width: 56.63%;
+    }
+
+    .header .other .operation{
+        width: 18.3%;
+        float: left;
+    }
+
+    .header .other .search {
+        width: 16.88%;
+        float: left;
+    }
+
+}
+
+@media (min-width: 1101px) and (max-width: 1440px){
+
+    .header .title-group{
+        width: 74%;
+    }
+
+    .header .date-time{
+        display: none;
+    }
+
+    .header .other .operation{
+        float: right;
+    }
+
+    .header .other .search {
+        float: right;
+    }
+
+
+}
+
+@media (max-width: 1100px) {
+    .header{
+        display: none;
+    }
+}

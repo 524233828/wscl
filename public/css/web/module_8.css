@@ -1,0 +1,80 @@
+.module-group .module-8{
+    /*height: 183px;*/
+    height: auto;
+    width: 94%;
+    float: left;
+    /*background-color: #F6F6F6;*/
+    padding: 16px 3%;
+    border: solid 1px #CCCCCC;
+}
+
+.module-group .module-8 .title{
+    width: 95%;
+    padding-left: 5%;
+    background-image: url("/images/module-8-title.png");
+    background-repeat: no-repeat;
+    font-size: 18px;
+    color: #FFFFFF;
+    line-height: 42px;
+    height: 40px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #5397e2;
+    margin-bottom: 14px;
+}
+
+.module-group .module-8 .content{
+    padding: 0px;
+    width: 100%;
+}
+
+.left-button{
+    width: 1.66%;
+    float: left;
+    padding: 41px 0;
+    height: 24px;
+}
+
+.left-arrow{
+    width: 0px;
+    height: 0px;
+    border-top: 12px solid #FFFFFF;
+    border-bottom: 12px solid #FFFFFF;
+    border-right: 14px solid #5397e2;
+}
+
+.right-button{
+    width: 1.66%;
+    float: right;
+    padding: 41px 0;
+    height: 24px;
+}
+
+.right-arrow{
+    width: 0px;
+    height: 0px;
+    border-top: 12px solid #FFFFFF;
+    border-bottom: 12px solid #FFFFFF;
+    border-left: 14px solid #5397e2;
+}
+
+.company-group{
+    width: 96.68%;
+    height: auto;
+    /*height: 107px;*/
+    float: left;
+}
+
+.company{
+    margin: 0 20px;
+    width: 100px;
+    float: left;
+    border: solid 1px #cccccc;
+}
+
+.company img{
+    width: 100%;
+}
+
+.tempWrap{
+    float: left;
+}
