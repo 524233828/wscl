@@ -9,49 +9,203 @@
 namespace App\Api\Controllers;
 
 
-use App\Models\Card;
-use App\Models\UserCard;
-use function GuzzleHttp\Psr7\parse_query;
+use App\AdminUser;
+use App\Api\Constant\ErrorCode;
+use App\Api\Constant\Score;
+use App\Console\Commands\PhoneArea;
+use App\Constant\JWTKey;
+use App\Models\BuildInfo;
+use App\Models\Company;
+use App\Models\County;
+use App\Models\ScoreItem;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Mushan\BaiduTongji\BaiduTongji;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
-class IndexController
+class IndexController extends BaseController
 {
 
-    public function index(Request $request)
+    public function login(Request $request)
     {
-//        $url = parse_url("http://jl.1sk1.cn");
-//        $path_arr = explode("/", $url['path']);
-//        dd($path_arr);
-        /**
-         * @var BaiduTongji $baiduTongji
-         */
-        $baiduTongji = resolve('BaiduTongji');
-        $today = date('Ymd');
-        $yesterday = date('Ymd', strtotime('yesterday'));
+        $credentials = $request->only(['username', 'password']);
 
-//        $result = $baiduTongji->getSiteLists();
-        $result = $baiduTongji->getData([
-            'site_id' => '13186253',
-            'method' => 'visit/toppage/a',
-            'start_date' => $yesterday,
-            'end_date' => $yesterday,
-            'metrics' => 'pv_count,visitor_count',
-//            'viewType' => "type"
-//            'gran' => 'day',
+        /** @var \Illuminate\Validation\Validator $validator */
+        $validator = Validator::make($credentials, [
+            'username'          => 'required',
+            'password'          => 'required',
         ]);
 
-        dd($result['items'][1]);
+        if ($validator->fails()) {//登录失败
+            return \response()->json(["code" => 1000, "msg"=>"登录失败", "data"=>[]]);
+        }
 
-        var_dump($result['items'][1]);
-        var_dump($result['sum']);
-        var_dump($result['pageSum']);
+        if (Auth::guard('admin')->attempt($credentials)) {//登录成功
 
+            $admin = AdminUser::where("username", "=", $request->get("username"))->get(["id"])->toArray();
+
+            return \response()->json(["code" => 1, "msg"=>"登录成功", "data"=>["token"=>$this->generateJWT($admin[0]['id'])]]);
+        }
+
+        return \response()->json(["code" => 1000, "msg"=>"登录失败", "data"=>[]]);
     }
 
-    public function getCard(Request $request)
+    protected function generateJWT($uid)
     {
-//        var_dump();
+        $token = [
+            'iss' => JWTKey::ISS,
+            'aud' => (string)$uid,
+            'iat' => time(),
+            'exp' => time() + (3600 * 24 * 365), // 有效期一年
+        ];
+
+        return JWT::encode($token, JWTKey::KEY, JWTKey::ALG);
+    }
+
+    public function getCounty(Request $request)
+    {
+        $city_id = $request->get("city_id", "440200");
+
+        $county = County::where("city_id", "=", $city_id)->get(["id", "name"])->toArray();
+
+        return $this->response($county);
+    }
+
+    public function getCompanies(Request $request)
+    {
+        $county_id = $request->get("county_id");
+
+        $where = [];
+
+        if(!empty($county_id)){
+            $where["county"] = $county_id;
+        }
+
+        $companies = Company::where($where)->get(["id", "name"]);
+
+        if(!empty($companies)){
+            $companies = $companies->toArray();
+        }else{
+            $companies = [];
+        }
+
+        return $this->response($companies);
+    }
+
+    public function getCompanyInfo(Request $request)
+    {
+        $company_id = $request->get("company_id");
+
+        if(empty($company_id)){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::COMPANY_NOT_FOUND),
+                ErrorCode::COMPANY_NOT_FOUND
+            );
+        }
+
+        $company = Company::find($company_id);
+
+        if(empty($company)){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::COMPANY_NOT_FOUND),
+                ErrorCode::COMPANY_NOT_FOUND
+            );
+        }
+
+        $base_info = $company->toArray();
+
+        $build_info = [];
+        //获取最近一次填写的建设信息
+        if($base_info['status']==0)
+        {
+            $build = BuildInfo::where("company_id", "=", $company_id)
+                ->orderBy("created_time","desc")->first();
+
+            if(!empty($build)){
+                $build_info = $build->toArray();
+            }
+        }
+
+        return $this->response(["base_info"=>$base_info, "build_info"=>$build_info]);
+    }
+
+    public function updateBuildInfo(Request $request)
+    {
+        $data = $request->toArray();
+
+        if(!isset($data['czwt'])){
+            $data['czwt'] = "";
+        }
+
+        $validator = validator($data, [
+            "tzms" => "required",
+            "sgdw" => "required",
+            "sgfzr" => "required",
+            "zw" => "required",
+            "lxfs" => "required",
+            "sgxclxr" => "required",
+            "xclxrlxfs" => "required",
+            "company_id" => "required",
+            "xz" => "required|in:0,1",
+            "zd" => "required|in:0,1",
+            "styp" => "required|in:0,1,2",
+            "kt" => "required|in:0,1",
+            "gwsg" => "required|in:0,1,2",
+            "tjsg" => "required|in:0,1,2",
+            "jdaz" => "required|in:0,1,2",
+            "syx" => "required|in:0,1",
+            "zsyx" => "required|in:0,1",
+            "jsjd" => "required|in:0,1,2,3",
+        ]);
+
+        if($validator->fails()){
+            echo $validator->errors();exit;
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::PARAMS_ERROR),
+                ErrorCode::PARAMS_ERROR
+            );
+        }
+
+        //TODO:管理员地区获取及判断
+        $admin = ["address" => 400200];
+
+        $company = Company::find($data['company_id']);
+        if(empty($company)){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::COMPANY_NOT_FOUND),
+                ErrorCode::COMPANY_NOT_FOUND
+            );
+        }
+
+        $company = $company->toArray();
+
+        if($admin["address"] != 400200 && $admin["address"] != $company['county']){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::FORBIDDEN),
+                ErrorCode::FORBIDDEN
+            );
+        }
+
+        $data['score'] = Score::computer($data);
+        $data['created_time'] = time();
+
+
+        $score = new BuildInfo();
+        $score->setRawAttributes($data);
+
+        if($score->save()){
+            return $this->response([]);
+        }else{
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::SYSTEM_ERROR),
+                ErrorCode::SYSTEM_ERROR
+            );
+        }
     }
 }

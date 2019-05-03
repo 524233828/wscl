@@ -21,6 +21,6 @@ class BaseController extends Controller
         $result['msg'] = $msg;
         $result['code'] = $code;
 
-        return \response()->json($result, $status, $header);
+        return \response()->json($result, $status, $header, JSON_UNESCAPED_UNICODE);
     }
 }

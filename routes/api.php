@@ -23,10 +23,9 @@ use Illuminate\Support\Facades\Route;
 //});
 
 //Route::get("/chapter","ChapterController@addChapter");
-Route::get("/get_card","IndexController@getCard");
-Route::get("/wechat/access_token","WechatController@getAccessToken");
-Route::post("/wechat/index","WechatController@index");
-Route::get("/wechat/index","WechatController@index");
-Route::get("/admin/reply","AdminController@reply");
 
-Route::get("/index", "IndexController@index");
+Route::post("/login", "IndexController@login");
+Route::get("/counties", "IndexController@getCounty");
+Route::get("/companies", "IndexController@getCompanies");
+Route::get("/company_info", "IndexController@getCompanyInfo");
+Route::post("/build_info", "IndexController@updateBuildInfo");

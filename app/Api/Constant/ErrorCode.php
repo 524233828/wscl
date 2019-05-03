@@ -16,12 +16,22 @@ class ErrorCode
 
     //错误码
     const SUCCESS = 1;
-    const GET_ACCESS_TOKEN_FAIL = 1000;
+    const PARAMS_ERROR = -1;
+    const SYSTEM_ERROR = -2;
+    const LOGIN_FAIL = 1000;
+    const USER_NOT_LOGIN = 1002;
+    const FORBIDDEN = 1003;
+    const COMPANY_NOT_FOUND = 2000;
 
     static $error = [
 
         self::SUCCESS => ["处理成功", Response::HTTP_OK],
-        self::GET_ACCESS_TOKEN_FAIL => ["获取access_token失败", Response::HTTP_BAD_REQUEST]
+        self::PARAMS_ERROR => ["参数错误", Response::HTTP_OK],
+        self::SYSTEM_ERROR => ["系统错误", Response::HTTP_OK],
+        self::LOGIN_FAIL => ["登录失败", Response::HTTP_BAD_REQUEST],
+        self::USER_NOT_LOGIN => ["未登录", Response::HTTP_BAD_REQUEST],
+        self::FORBIDDEN => ["无权限操作", Response::HTTP_BAD_REQUEST],
+        self::COMPANY_NOT_FOUND => ["污水厂不存在", Response::HTTP_BAD_REQUEST]
     ];
 
 

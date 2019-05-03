@@ -16,21 +16,15 @@ Route::group([
 
     $router->resource('/users', 'UserController');
     $router->resource('/table', 'TableController');
-//    $router->resource('/demo', 'DemoController');
-//    $router->resource('/card', 'CardController');
-//    $router->resource('/chapter', 'ChapterController');
-//    $router->resource('/user_cards', 'UserCardController');
-//    $router->resource('/callable_function_type', 'CallableFunctionTypeController');
-//    $router->resource('/callable_function', 'CallableFunctionController');
-//    $router->resource('/field_type', 'FieldTypeController');
-//    $router->resource('/admin_dashboard', 'AdminDashboardController');
     $router->resource('/dash', 'DashBoardController');
     $router->post('/dash/{key}', 'DashBoardController@create');
     $router->get('/dash/{key}/edit', 'DashBoardController@edit');
 
     $router->resource('/apps', 'AppController');
-
-    $router->resource('/menus', 'MenuController');
+    $router->resource('/companies', 'CompanyController');
+    $router->resource('/options', 'OptionController');
+    $router->resource('/score_items', 'ScoreItemController');
+    $router->resource('/county', 'CountyController');
 
 
 
