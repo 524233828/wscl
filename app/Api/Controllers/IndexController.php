@@ -18,6 +18,7 @@ use App\Models\BuildInfo;
 use App\Models\Company;
 use App\Models\County;
 use App\Models\ScoreItem;
+use App\User;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,24 @@ class IndexController extends BaseController
 
         $county = County::where("city_id", "=", $city_id)->get(["id", "name"])->toArray();
 
+        $company = new Company();
+
+
+        $score = $company->getCountyAverageScore();
+
+        $score_arr = [];
+        foreach ($score as $value){
+            $score_arr[$value->county] = floor($value->score);
+        }
+
+        foreach ($county as &$item){
+            if(isset($score_arr[$item['id']])){
+                $item["score"] = $score_arr[$item['id']];
+            }else{
+                $item['score'] = 0;
+            }
+        }
+
         return $this->response($county);
     }
 
@@ -77,11 +96,16 @@ class IndexController extends BaseController
 
         $where = [];
 
-        if(!empty($county_id)){
+        if(!empty($county_id)) {
             $where["county"] = $county_id;
+            $county = County::find($county_id)->toArray();
+            $county_name = $county['name'];
+
+        }else{
+            $county_name = "韶关市";
         }
 
-        $companies = Company::where($where)->get(["id", "name"]);
+        $companies = Company::where($where)->get(["id", "name","score","status"]);
 
         if(!empty($companies)){
             $companies = $companies->toArray();
@@ -89,7 +113,9 @@ class IndexController extends BaseController
             $companies = [];
         }
 
-        return $this->response($companies);
+        $data = ["county_name" => $county_name, "companies" => $companies];
+
+        return $this->response($data);
     }
 
     public function getCompanyInfo(Request $request)
@@ -161,7 +187,6 @@ class IndexController extends BaseController
         ]);
 
         if($validator->fails()){
-            echo $validator->errors();exit;
             return $this->response(
                 [],
                 ErrorCode::msg(ErrorCode::PARAMS_ERROR),
@@ -169,8 +194,9 @@ class IndexController extends BaseController
             );
         }
 
-        //TODO:管理员地区获取及判断
-        $admin = ["address" => 400200];
+        //管理员地区获取及判断
+        $admin = AdminUser::$user->toArray()[0];
+        $admin = ["address" => $admin['address_id']];
 
         $company = Company::find($data['company_id']);
         if(empty($company)){
@@ -181,9 +207,9 @@ class IndexController extends BaseController
             );
         }
 
-        $company = $company->toArray();
+        $company_arr = $company->toArray();
 
-        if($admin["address"] != 400200 && $admin["address"] != $company['county']){
+        if($admin["address"] != 440200 && $admin["address"] != $company_arr['county']){
             return $this->response(
                 [],
                 ErrorCode::msg(ErrorCode::FORBIDDEN),
@@ -194,6 +220,8 @@ class IndexController extends BaseController
         $data['score'] = Score::computer($data);
         $data['created_time'] = time();
 
+        $company->score = $data['score'];
+        $company->save();
 
         $score = new BuildInfo();
         $score->setRawAttributes($data);

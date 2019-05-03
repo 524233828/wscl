@@ -28,4 +28,4 @@ Route::post("/login", "IndexController@login");
 Route::get("/counties", "IndexController@getCounty");
 Route::get("/companies", "IndexController@getCompanies");
 Route::get("/company_info", "IndexController@getCompanyInfo");
-Route::post("/build_info", "IndexController@updateBuildInfo");
+Route::post("/build_info", "IndexController@updateBuildInfo")->middleware("dispatch", "login");

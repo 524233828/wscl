@@ -3,6 +3,8 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Middleware\Dispatch;
+use Middleware\LoginCheck;
 
 class Kernel extends HttpKernel
 {
@@ -60,5 +62,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'dispatch' => \App\Http\Middleware\Dispatch::class,
+        'login' => \App\Http\Middleware\LoginCheck::class
     ];
 }

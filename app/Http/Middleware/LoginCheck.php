@@ -6,17 +6,16 @@
  * Time: 15:05
  */
 
-namespace Middleware;
+namespace App\Http\Middleware;
 
 use App\AdminUser;
 use App\Api\Constant\ErrorCode;
-use Illuminate\Support\Facades\Auth;
-use Psr\Http\Message\ServerRequestInterface;
+use Illuminate\Http\Request;
 
 class LoginCheck
 {
 
-    public function handle(ServerRequestInterface $request, \Closure $next, $gurad = null)
+    public function handle(Request $request, \Closure $next, $gurad = null)
     {
         if (!empty(AdminUser::$user)) {
             $response = $next($request);

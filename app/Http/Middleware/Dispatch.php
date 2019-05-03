@@ -1,18 +1,18 @@
 <?php
-namespace Middleware;
+namespace App\Http\Middleware;
 
 use App\AdminUser;
 use App\Constant\JWTKey;
 use Firebase\JWT\JWT;
-use Psr\Http\Message\ServerRequestInterface;
+use Illuminate\Http\Request;
 
 class Dispatch
 {
 
-    public function handle(ServerRequestInterface $request, \Closure $next)
+    public function handle(Request $request, \Closure $next)
     {
 
-        $token = $request->getHeaderLine('Authorization');
+        $token = $request->header('Authorization');
         if ($token) {
             // 只做拆分获取用户ID，不判断可用性
             try {

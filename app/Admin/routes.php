@@ -25,6 +25,7 @@ Route::group([
     $router->resource('/options', 'OptionController');
     $router->resource('/score_items', 'ScoreItemController');
     $router->resource('/county', 'CountyController');
+    $router->resource('/my_users', 'UserController');
 
 
 

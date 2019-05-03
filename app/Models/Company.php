@@ -10,8 +10,19 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Company extends Model
 {
     protected $table = "wscl_companies";
+
+    public function getCountyAverageScore()
+    {
+
+        return DB::table($this->table)
+            ->select(DB::raw("county, AVG(score) as score"))
+            ->groupBy("county")
+            ->get()->toArray();
+
+    }
 }
