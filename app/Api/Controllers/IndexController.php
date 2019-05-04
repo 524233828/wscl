@@ -184,6 +184,7 @@ class IndexController extends BaseController
             "syx" => "required|in:0,1",
             "zsyx" => "required|in:0,1",
             "jsjd" => "required|in:0,1,2,3",
+            "month" => "required",
         ]);
 
         if($validator->fails()){
@@ -224,9 +225,16 @@ class IndexController extends BaseController
         $company->save();
 
         $score = new BuildInfo();
-        $score->setRawAttributes($data);
+        $score_find = $score->where([["company_id", "=", $data['company_id']], ["month", "=", $data['month']]])->first();
 
-        if($score->save()){
+        if($score_find){
+            $result = $score->where([["company_id", "=", $data['company_id']], ["month", "=", $data['month']]])->update($data);
+        }else{
+            $score->setRawAttributes($data);
+            $result = $score->save();
+        }
+
+        if($result){
             return $this->response([]);
         }else{
             return $this->response(
