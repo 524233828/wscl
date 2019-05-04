@@ -25,4 +25,18 @@ class Company extends Model
             ->get()->toArray();
 
     }
+
+    public function county(){
+        return $this->belongsTo(County::class, "county");
+    }
+
+    public static function getCompany()
+    {
+        $county = self::all(["id","name"])->toArray();
+        $county_index_arr = [];
+        foreach ($county as $value){
+            $county_index_arr[$value['id']] = $value['name'];
+        }
+        return $county_index_arr;
+    }
 }

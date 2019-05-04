@@ -17,4 +17,9 @@ class BuildInfo extends Model
     protected $table = "wscl_jsjd";
 
     protected $fillable = ["company_id"];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class,"company_id");
+    }
 }
