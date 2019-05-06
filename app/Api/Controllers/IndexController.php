@@ -23,6 +23,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class IndexController extends BaseController
 {
@@ -243,5 +244,101 @@ class IndexController extends BaseController
                 ErrorCode::SYSTEM_ERROR
             );
         }
+    }
+
+    public function excel()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells("A1:T1");
+        $sheet->setCellValue("A1","2019年3月份镇级污水处理设施及配套管网建设工作考核得分表");
+        $sheet->mergeCells("B1:T2");
+        //表头
+        $head = ["序号","县（市、区）","项目名称","管网施工（10分）","选址（10分）","征地（20分）","三通一平（10分）","勘探（10分）",
+            "土建施工（15分）","机电安装（10分）","试运行（10分）","正式运行（5分）","建设进度（-10分）","得分","得分合计","总分",
+            "完成率","排名","扣分说明",];
+
+        $sheet->fromArray($head, null, "A3");
+
+        $sheet->freezePane();
+    }
+
+    public function updateBaseInfo(Request $request)
+    {
+        $data = $request->toArray();
+
+        if(!isset($data['czwt'])){
+            $data['czwt'] = "";
+        }
+
+        $validator = validator($data, [
+            "scale" => "required",
+            "operation_mode" => "required",
+            "completed_at" => "required",
+            "tecnology" => "required",
+            "water_quality" => "required",
+            "pipeline_length" => "required",
+            "address" => "required",
+            "authority" => "required",
+            "leader" => "required",
+            "job" => "required",
+            "contact" => "required",
+            "company_id" => "required",
+        ]);
+
+        if($validator->fails()){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::PARAMS_ERROR),
+                ErrorCode::PARAMS_ERROR
+            );
+        }
+
+        //管理员地区获取及判断
+        $admin = AdminUser::$user->toArray()[0];
+        $admin = ["address" => $admin['address_id']];
+
+        $company = Company::find($data['company_id']);
+        if(empty($company)){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::COMPANY_NOT_FOUND),
+                ErrorCode::COMPANY_NOT_FOUND
+            );
+        }
+
+        $company_arr = $company->toArray();
+
+        if($admin["address"] != 440200 && $admin["address"] != $company_arr['county']){
+            return $this->response(
+                [],
+                ErrorCode::msg(ErrorCode::FORBIDDEN),
+                ErrorCode::FORBIDDEN
+            );
+        }
+
+        $company->scale = $data['scale'];
+        $company->operation_mode = $data['operation_mode'];
+        $company->completed_at = $data['completed_at'];
+        $company->tecnology = $data['tecnology'];
+        $company->water_quality = $data['water_quality'];
+        $company->pipeline_length = $data['pipeline_length'];
+        $company->address = $data['address'];
+        $company->authority = $data['authority'];
+        $company->leader = $data['leader'];
+        $company->job = $data['job'];
+        $company->contact = $data['contact'];
+
+        if($company->save()){
+            return $this->response([]);
+        }
+
+        return $this->response(
+            [],
+            ErrorCode::msg(ErrorCode::SYSTEM_ERROR),
+            ErrorCode::SYSTEM_ERROR
+        );
+
     }
 }
