@@ -24,6 +24,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 
 class IndexController extends BaseController
 {
@@ -246,22 +248,220 @@ class IndexController extends BaseController
         }
     }
 
-    public function excel()
+    public function excel(Request $request)
     {
+
+        $month = $request->get("month");
+        $time = strtotime($month."01000000");
+        $year = date("Y", $time);
+        $months = date("m", $time);
+        if(empty($month)){
+            return false;
+        }
+
+        /**
+         * data格式
+         *
+         * [
+         *  county_id => [
+         *      "county" => ""
+         *      "sum_score" => ""
+         *      "score" => ""
+         *      "finish_rate" => ""
+         *      "rank" => "",
+         *      "companies" => [
+         *          company_id => [
+         *              "name" => ""
+         *              "各项评分" => ""
+         *          ]
+         *      ]
+         *  ]
+         * ]
+         */
+        $data = [];
+
+        //获取市县
+        $counties = County::all(["id", "name"])->toArray();
+
+        foreach($counties as $county)
+        {
+            $data[$county['id']] = [
+                "county" => $county['name'],
+                "sum_score" => 0,
+                "total_score" => 0,
+                "finish_rate" => 0,
+                "rank" => 0,
+                "companies" => [],
+            ];
+        }
+
+        //获取污水厂
+        $companies = Company::all(["id", "name", "county"])->toArray();
+
+        foreach ($companies as $company){
+            $data[$company["county"]]["companies"][$company['id']] = [
+                "name" => $company['name'],
+                "xz" => 0,
+                "zd" => 0,
+                "styp" => 0,
+                "kt" => 0,
+                "gwsg" => 0,
+                "tjsg" => 0,
+                "jdaz" => 0,
+                "syx" => 0,
+                "zsyx" => 0,
+                "jsjd" => 0,
+            ];
+        }
+
+        //获取月份数据
+        $build_info = BuildInfo::where("month","=" , $month)
+            ->leftJoin("wscl_companies","wscl_jsjd.company_id", "=", "wscl_companies.id")->get();
+        $score = [];
+
+        foreach ($build_info as $item)
+        {
+            $item = $item->toArray();
+            if(isset($score[$item['county']])){
+                $score[$item['county']] += Score::computer($item);
+            }else{
+                $score[$item['county']] = Score::computer($item);
+            }
+
+            $data[$item['county']]["companies"][$item['company_id']]["xz"] = Score::$score_list["xz"][$item['xz']];
+            $data[$item['county']]["companies"][$item['company_id']]["zd"] = Score::$score_list["zd"][$item['zd']];
+            $data[$item['county']]["companies"][$item['company_id']]["styp"] = Score::$score_list["styp"][$item['styp']];
+            $data[$item['county']]["companies"][$item['company_id']]["kt"] = Score::$score_list["kt"][$item['kt']];
+            $data[$item['county']]["companies"][$item['company_id']]["gwsg"] = Score::$score_list["gwsg"][$item['gwsg']];
+            $data[$item['county']]["companies"][$item['company_id']]["tjsg"] = Score::$score_list["tjsg"][$item['tjsg']];
+            $data[$item['county']]["companies"][$item['company_id']]["jdaz"] = Score::$score_list["jdaz"][$item['jdaz']];
+            $data[$item['county']]["companies"][$item['company_id']]["syx"] = Score::$score_list["syx"][$item['syx']];
+            $data[$item['county']]["companies"][$item['company_id']]["zsyx"] = Score::$score_list["zsyx"][$item['zsyx']];
+            $data[$item['county']]["companies"][$item['company_id']]["jsjd"] = Score::$score_list["jsjd"][$item['jsjd']];
+            $data[$item['county']]["companies"][$item['company_id']]["score"] = Score::computer($item);
+
+        }
+
+
+
+        foreach ($data as $key => &$datum){
+            if(isset($score[$key])){
+                $datum["sum_score"] = $score[$key];
+            } else{
+                $datum["sum_score"] = 0;
+            }
+            $count = count($datum["companies"]);
+            $datum["total_score"] = $count * 100;
+
+            if($count != 0 ){
+                $datum["finish_rate"] = (float)bcdiv($datum["sum_score"], $count, 2);
+            }else{
+                $datum["finish_rate"] = 0;
+            }
+
+            $data[$key]["companies"] = array_values($data[$key]["companies"]);
+        }
+
+        $data = array_values($data);
+//        var_dump($data);exit;
+
+        $stored = collect($data)->sortByDesc(function($item, $key){
+            return $item['finish_rate'];
+        });
+
+        $data =$stored->values()->all();
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        try{
+            $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->mergeCells("A1:T1");
-        $sheet->setCellValue("A1","2019年3月份镇级污水处理设施及配套管网建设工作考核得分表");
-        $sheet->mergeCells("B1:T2");
-        //表头
-        $head = ["序号","县（市、区）","项目名称","管网施工（10分）","选址（10分）","征地（20分）","三通一平（10分）","勘探（10分）",
-            "土建施工（15分）","机电安装（10分）","试运行（10分）","正式运行（5分）","建设进度（-10分）","得分","得分合计","总分",
-            "完成率","排名","扣分说明",];
+            $sheet->mergeCells("A1:T1");
+            $sheet->setCellValue("A1","{$year}年{$months}月份镇级污水处理设施及配套管网建设工作考核得分表");
+            $sheet->mergeCells("A2:T2");
+            //表头
+            $head = ["序号","县（市、区）","项目名称","管网施工（10分）","选址（10分）","征地（20分）","三通一平（10分）","勘探（10分）",
+                "土建施工（15分）","机电安装（10分）","试运行（10分）","正式运行（5分）","建设进度（-10分）","得分","得分合计","总分",
+                "分值占比","完成率","排名","扣分说明",];
 
-        $sheet->fromArray($head, null, "A3");
+            $sheet->fromArray($head, null, "A3");
 
-        $sheet->freezePane();
+            $sheet->freezePane("A1");
+            $sheet->freezePane("A2");
+            $sheet->freezePane("A3");
+            $sheet->getRowDimension("1")->setRowHeight(35);
+            $sheet->getRowDimension("2")->setRowHeight(35);
+            $sheet->getRowDimension("3")->setRowHeight(68);
+            $sheet->getStyle("A1")->applyFromArray(
+                [
+                    "font" => ["size" => 18],
+                    "alignment" => ["horizontal" => Alignment::HORIZONTAL_CENTER]
+                ]
+            );
+
+            $i = 1;
+            $row_index = 4;
+            foreach ($data as &$datum)
+            {
+                $datum["rank"] = $i;
+                $i++;
+
+                $count = count($datum['companies']);
+                if($count == 0){
+                    $to_row_index =$row_index;
+                }else{
+                    $to_row_index =$row_index + $count - 1;
+                }
+
+
+                $sheet->mergeCells("B".$row_index.":B".$to_row_index);
+                $sheet->mergeCells("O".$row_index.":O".$to_row_index);
+                $sheet->mergeCells("P".$row_index.":P".$to_row_index);
+                $sheet->mergeCells("Q".$row_index.":Q".$to_row_index);
+                $sheet->mergeCells("R".$row_index.":R".$to_row_index);
+                $sheet->mergeCells("S".$row_index.":S".$to_row_index);
+
+                $sheet->setCellValue("B".$row_index, $datum['county']. "({$count}座)");
+                $sheet->setCellValue("O".$row_index, $datum['sum_score']);
+                $sheet->setCellValue("P".$row_index, $datum['total_score']);
+                $sheet->setCellValue("Q".$row_index, $datum['finish_rate']);
+                $sheet->setCellValue("R".$row_index, $datum['finish_rate']. "%");
+                $sheet->setCellValue("S".$row_index, $datum['rank']);
+
+                $j = $row_index;//行数
+                $k = 1;//序号
+                foreach ($datum['companies'] as $company)
+                {
+                    $sheet->setCellValue("A".$j, $k);
+                    $sheet->setCellValue("C".$j, $company['name']);
+                    $sheet->setCellValue("D".$j, $company['gwsg']);
+                    $sheet->setCellValue("E".$j, $company['xz']);
+                    $sheet->setCellValue("F".$j, $company['zd']);
+                    $sheet->setCellValue("G".$j, $company['styp']);
+                    $sheet->setCellValue("H".$j, $company['kt']);
+                    $sheet->setCellValue("I".$j, $company['tjsg']);
+                    $sheet->setCellValue("J".$j, $company['jdaz']);
+                    $sheet->setCellValue("K".$j, $company['syx']);
+                    $sheet->setCellValue("L".$j, $company['zsyx']);
+                    $sheet->setCellValue("M".$j, $company['jsjd']);
+                    $sheet->setCellValue("N".$j, $company['score']);
+                    $j++;
+                    $k++;
+                }
+
+                $row_index = $to_row_index+1;
+
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="aaa.xlsx"');
+            header('Cache-Control: max-age=0');
+
+            $writer->save('php://output');
+        }catch (\Exception $exception){
+            echo $exception->getMessage();
+        }
+
     }
 
     public function updateBaseInfo(Request $request)

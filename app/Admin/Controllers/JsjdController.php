@@ -8,6 +8,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\Tools\Export;
 use App\Models\BuildInfo;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -105,6 +106,10 @@ class JsjdController extends Controller
             $grid->column("created_at","提交时间")->sortable();
 
 
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->append(new Export());
+            });
+            $grid->disableExport();
             //允许筛选的项
             //筛选规则不允许用like，且搜索字段必须为索引字段
             //TODO: 使用模糊查询必须通过搜索引擎，此处请扩展搜索引擎
