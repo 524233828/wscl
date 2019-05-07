@@ -515,7 +515,7 @@ class IndexController extends BaseController
         if(isset($data['operation_mode']) && !empty($data['operation_mode'])){
             $company->operation_mode = $data['operation_mode'];
         }
-        if(isset($data['completed_at']) && !empty($data['completed_at'])){
+        if(isset($data['completed_at'])){
             $company->completed_at = $data['completed_at'];
         }
         if(isset($data['tecnology']) && !empty($data['tecnology'])){
