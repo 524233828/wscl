@@ -311,6 +311,7 @@ class IndexController extends BaseController
                 "syx" => 0,
                 "zsyx" => 0,
                 "jsjd" => 0,
+                "score" => 0,
             ];
         }
 
