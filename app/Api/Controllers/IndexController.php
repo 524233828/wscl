@@ -399,6 +399,7 @@ class IndexController extends BaseController
             );
 
             $i = 1;
+            $k = 1;//序号
             $row_index = 4;
             foreach ($data as &$datum)
             {
@@ -428,7 +429,7 @@ class IndexController extends BaseController
                 $sheet->setCellValue("S".$row_index, $datum['rank']);
 
                 $j = $row_index;//行数
-                $k = 1;//序号
+
                 foreach ($datum['companies'] as $company)
                 {
                     $sheet->setCellValue("A".$j, $k);
