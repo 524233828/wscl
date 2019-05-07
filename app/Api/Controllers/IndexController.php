@@ -531,6 +531,10 @@ class IndexController extends BaseController
         $company->leader = $data['leader'];
         $company->job = $data['job'];
         $company->contact = $data['contact'];
+        if(isset($data['status']) && in_array($data['status'], [0,1])){
+            $company->status = $data['status'];
+        }
+        $company->status = isset($data['status']) ? $data['status'] : 0;
 
         if($company->save()){
             return $this->response([]);
