@@ -516,7 +516,10 @@ class IndexController extends BaseController
             $company->operation_mode = $data['operation_mode'];
         }
         if(isset($data['completed_at'])){
-            $company->completed_at = $data['completed_at'];
+            if(empty($data['completed_at'])){
+                $company->completed_at = null;
+            }
+
         }
         if(isset($data['tecnology']) && !empty($data['tecnology'])){
             $company->tecnology = $data['tecnology'];
