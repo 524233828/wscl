@@ -475,17 +475,6 @@ class IndexController extends BaseController
         }
 
         $validator = validator($data, [
-            "scale" => "required",
-            "operation_mode" => "required",
-            "completed_at" => "required",
-            "tecnology" => "required",
-            "water_quality" => "required",
-            "pipeline_length" => "required",
-            "address" => "required",
-            "authority" => "required",
-            "leader" => "required",
-            "job" => "required",
-            "contact" => "required",
             "company_id" => "required",
         ]);
 
@@ -520,17 +509,40 @@ class IndexController extends BaseController
             );
         }
 
-        $company->scale = $data['scale'];
-        $company->operation_mode = $data['operation_mode'];
-        $company->completed_at = $data['completed_at'];
-        $company->tecnology = $data['tecnology'];
-        $company->water_quality = $data['water_quality'];
-        $company->pipeline_length = $data['pipeline_length'];
-        $company->address = $data['address'];
-        $company->authority = $data['authority'];
-        $company->leader = $data['leader'];
-        $company->job = $data['job'];
-        $company->contact = $data['contact'];
+        if(isset($data['scale']) && !empty($data['scale'])){
+            $company->scale = $data['scale'];
+        }
+        if(isset($data['operation_mode']) && !empty($data['operation_mode'])){
+            $company->operation_mode = $data['operation_mode'];
+        }
+        if(isset($data['completed_at']) && !empty($data['completed_at'])){
+            $company->completed_at = $data['completed_at'];
+        }
+        if(isset($data['tecnology']) && !empty($data['tecnology'])){
+            $company->tecnology = $data['tecnology'];
+        }
+        if(isset($data['water_quality']) && !empty($data['water_quality'])){
+            $company->water_quality = $data['water_quality'];
+        }
+        if(isset($data['pipeline_length']) && !empty($data['pipeline_length'])){
+            $company->pipeline_length = $data['pipeline_length'];
+        }
+        if(isset($data['address']) && !empty($data['address'])){
+            $company->address = $data['address'];
+        }
+        if(isset($data['authority']) && !empty($data['authority'])){
+            $company->authority = $data['authority'];
+        }
+        if(isset($data['leader']) && !empty($data['leader'])){
+            $company->leader = $data['leader'];
+        }
+        if(isset($data['job']) && !empty($data['job'])){
+            $company->job = $data['job'];
+        }
+        if(isset($data['contact']) && !empty($data['contact'])){
+            $company->contact = $data['contact'];
+        }
+
         if(isset($data['status']) && in_array($data['status'], [0,1])){
             $company->status = $data['status'];
         }
