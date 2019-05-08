@@ -162,7 +162,8 @@ class JsjdController extends Controller
                 0 => "选址、征地、三通一平、勘探等指标比上月无进展",
                 1=>"管网施工比上月无进展",
                 2=>"当月已完成三通一平和勘探，下月未开始土建施工",
-                3=>"出现其他停滞情况"]);
+                3=>"出现其他停滞情况",
+                4=>"无不良情况"])->default(4);
 
             $form->editor('czwt', '存在问题')->rules("required|string");
             $form->datetime('created_at',"提交时间");
