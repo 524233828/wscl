@@ -131,8 +131,9 @@ class JsjdController extends Controller
     {
         return Admin::form(BuildInfo::class, function (Form $form) {
 
+            $companies = Company::getCompany();
             $form->display('id',"ID");
-            $form->text('company.name',"污水厂id")->rules("required|integer");
+            $form->select('company_id',"污水厂")->options($companies);
             $form->text('tzms',"投资模式")->rules("required|string");
             $form->text('sgdw',"施工单位")->rules("required|string");
             $form->text('sgfzr',"施工负责人")->rules("required|string");
@@ -168,11 +169,10 @@ class JsjdController extends Controller
             $form->editor('czwt', '存在问题')->rules("required|string");
             $form->datetime('created_at',"提交时间");
             $form->datetime('updated_at',"最近更新时间");
-            $form->select("status","状态")->options([0 => "冻结", 1=>"启用"]);
+            $form->select("status","状态")->options([0 => "冻结", 1=>"启用"])->default(1);
 
-            $form->text('created_time',"创建时间戳")->rules("required|integer");
             $form->text('score',"score")->rules("required|integer");
-            $form->text('month',"提交的月份")->rules("required|string");
+            $form->datetime('month',"提交的月份")->format("YYYYMM")->rules("required|string");
 
 
         });
