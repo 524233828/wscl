@@ -166,7 +166,7 @@ class JsjdController extends Controller
                 3=>"出现其他停滞情况",
                 4=>"无不良情况"])->default(4);
 
-            $form->editor('czwt', '存在问题')->rules("required|string");
+            $form->editor('czwt', '存在问题');
             $form->datetime('created_at',"提交时间");
             $form->datetime('updated_at',"最近更新时间");
             $form->select("status","状态")->options([0 => "冻结", 1=>"启用"])->default(1);
