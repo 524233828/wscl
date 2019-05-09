@@ -134,13 +134,13 @@ class JsjdController extends Controller
             $companies = Company::getCompany();
             $form->display('id',"ID");
             $form->select('company_id',"污水厂")->options($companies);
-            $form->text('tzms',"投资模式")->rules("required|string");
-            $form->text('sgdw',"施工单位")->rules("required|string");
-            $form->text('sgfzr',"施工负责人")->rules("required|string");
-            $form->text('zw',"职务")->rules("required|string");
-            $form->text('lxfs',"联系方式")->rules("required|string");
-            $form->text('sgxclxr',"施工现场联系人")->rules("required|string");
-            $form->text('xclxrlxfs',"现场联系人联系方式")->rules("required|string");
+            $form->text('tzms',"投资模式");
+            $form->text('sgdw',"施工单位");
+            $form->text('sgfzr',"施工负责人");
+            $form->text('zw',"职务");
+            $form->text('lxfs',"联系方式");
+            $form->text('sgxclxr',"施工现场联系人");
+            $form->text('xclxrlxfs',"现场联系人联系方式");
             $form->select("xz","选址")->options([0 => "未完成", 1=>"已完成"]);
 
             $form->select("zd","征地")->options([0 => "未完成", 1=>"已完成"]);
