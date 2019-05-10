@@ -372,11 +372,12 @@ class IndexController extends BaseController
 
         $data =$stored->values()->all();
         $spreadsheet = new Spreadsheet();
+        $title = "{$year}年{$months}月份镇级污水处理设施及配套管网建设工作考核得分表";
         try{
             $sheet = $spreadsheet->getActiveSheet();
 
             $sheet->mergeCells("A1:T1");
-            $sheet->setCellValue("A1","{$year}年{$months}月份镇级污水处理设施及配套管网建设工作考核得分表");
+            $sheet->setCellValue("A1",$title);
             $sheet->mergeCells("A2:T2");
             //表头
             $head = ["序号","县（市、区）","项目名称","管网施工（10分）","选址（10分）","征地（20分）","三通一平（10分）","勘探（10分）",
@@ -456,7 +457,7 @@ class IndexController extends BaseController
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="aaa.xlsx"');
+            header('Content-Disposition: attachment;filename="'.$title.'.xlsx"');
             header('Cache-Control: max-age=0');
 
             $writer->save('php://output');
