@@ -168,35 +168,35 @@ class IndexController extends BaseController
             $data['czwt'] = "";
         }
 
-        $validator = validator($data, [
-            "tzms" => "required",
-            "sgdw" => "required",
-            "sgfzr" => "required",
-            "zw" => "required",
-            "lxfs" => "required",
-            "sgxclxr" => "required",
-            "xclxrlxfs" => "required",
-            "company_id" => "required",
-            "xz" => "required|in:0,1",
-            "zd" => "required|in:0,1",
-            "styp" => "required|in:0,1,2",
-            "kt" => "required|in:0,1",
-            "gwsg" => "required|in:0,1,2",
-            "tjsg" => "required|in:0,1,2",
-            "jdaz" => "required|in:0,1,2",
-            "syx" => "required|in:0,1",
-            "zsyx" => "required|in:0,1",
-            "jsjd" => "required|in:0,1,2,3",
-            "month" => "required",
-        ]);
+//        $validator = validator($data, [
+//            "tzms" => "required",
+//            "sgdw" => "required",
+//            "sgfzr" => "required",
+//            "zw" => "required",
+//            "lxfs" => "required",
+//            "sgxclxr" => "required",
+//            "xclxrlxfs" => "required",
+//            "company_id" => "required",
+//            "xz" => "required|in:0,1",
+//            "zd" => "required|in:0,1",
+//            "styp" => "required|in:0,1,2",
+//            "kt" => "required|in:0,1",
+//            "gwsg" => "required|in:0,1,2",
+//            "tjsg" => "required|in:0,1,2",
+//            "jdaz" => "required|in:0,1,2",
+//            "syx" => "required|in:0,1",
+//            "zsyx" => "required|in:0,1",
+//            "jsjd" => "required|in:0,1,2,3",
+//            "month" => "required",
+//        ]);
 
-        if($validator->fails()){
-            return $this->response(
-                [],
-                ErrorCode::msg(ErrorCode::PARAMS_ERROR),
-                ErrorCode::PARAMS_ERROR
-            );
-        }
+//        if($validator->fails()){
+//            return $this->response(
+//                [],
+//                ErrorCode::msg(ErrorCode::PARAMS_ERROR),
+//                ErrorCode::PARAMS_ERROR
+//            );
+//        }
 
         //管理员地区获取及判断
         $admin = AdminUser::$user->toArray()[0];
