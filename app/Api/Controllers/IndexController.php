@@ -340,7 +340,7 @@ class IndexController extends BaseController
             $data[$item['county']]["companies"][$item['company_id']]["zsyx"] = Score::$score_list["zsyx"][$item['zsyx']];
             $data[$item['county']]["companies"][$item['company_id']]["jsjd"] = Score::$score_list["jsjd"][$item['jsjd']];
             $data[$item['county']]["companies"][$item['company_id']]["score"] = Score::computer($item);
-            $data[$item['county']]["companies"][$item['company_id']]["czwt"] = $item['czwt'];
+            $data[$item['county']]["companies"][$item['company_id']]["czwt"] = isset($item['czwt'])?$item['czwt']:"";
 
         }
 
@@ -447,7 +447,7 @@ class IndexController extends BaseController
                     $sheet->setCellValue("L".$j, $company['zsyx']);
                     $sheet->setCellValue("M".$j, $company['jsjd']);
                     $sheet->setCellValue("N".$j, $company['score']);
-                    $sheet->setCellValue("T".$j, $company['czwt']);
+                    $sheet->setCellValue("T".$j, isset($company['czwt'])?$company['czwt']:"");
                     $j++;
                     $k++;
                 }
