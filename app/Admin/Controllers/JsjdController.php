@@ -9,6 +9,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Tools\Export;
+use App\Api\Constant\Score;
 use App\Models\BuildInfo;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -164,16 +165,42 @@ class JsjdController extends Controller
                 1=>"管网施工比上月无进展（-5分）",
                 2=>"当月已完成三通一平和勘探，下月未开始土建施工（-5分）",
                 3=>"出现其他停滞情况（-5分）",
-                4=>"无不良情况（0分）"])->default(4);
+                4=>"无扣分项（0分）",
+                5=>"其他扣分（-15分）",
+                6=>"其他扣分（-20分）",
+                7=>"其他扣分（-25分）",
+                8=>"其他扣分（-30分）",
+                9=>"其他扣分（-35分）",
+            ])->default(4);
 
             $form->editor('czwt', '存在问题');
             $form->datetime('created_at',"提交时间");
             $form->datetime('updated_at',"最近更新时间");
             $form->select("status","状态")->options([0 => "冻结", 1=>"启用"])->default(1);
 
-            $form->text('score',"score")->rules("required|integer");
+            $form->text('score',"score")->rules("required|integer")->readOnly();
             $form->datetime('month',"提交的月份")->format("YYYYMM")->rules("required|string");
 
+            $form->saved(function (Form $form) {
+
+                $data = $form->model()->toArray();
+                $score = Score::computer($data);
+                $form->model()->score = $score;
+                $form->model()->save();
+                /**
+                 * 获取最后一个月的评分项
+                 */
+                $last_month_data = BuildInfo::where([
+                    ["company_id","=",$form->model()->company_id],
+                ])->orderByDesc("month")->limit(1)->get()->toArray();
+                $last_month_data = $last_month_data[0];
+                if($last_month_data['id'] == $data['id'])
+                {
+                    $company = Company::find($form->model()->company_id);
+                    $company->score = Score::computer($last_month_data);
+                    $company->save();
+                }
+            });
 
         });
     }

@@ -138,8 +138,6 @@ class CompanyController extends Controller
             $form->text('contact',"联系方式")->default("");
             $form->select("status","状态")->options([0=>"未建成", 1=>"已建成"]);
 
-
-
         });
     }
 
