@@ -91,11 +91,11 @@ class IndexController extends BaseController
 
         unset($item);
 
-        $current_month = date("Ym");
+        $current_month = date("Ym", strtotime(date("Y-m-d") . " -1 month"));
 
         $current_month_data = $this->computerData($current_month);
 
-        $last_month = date("Ym", strtotime(date("Y-m-d") . " -1 month"));
+        $last_month = date("Ym", strtotime(date("Y-m-d") . " -2 month"));
 
         $last_month_data = $this->computerData($last_month);
 
