@@ -31,3 +31,4 @@ Route::get("/company_info", "IndexController@getCompanyInfo");
 Route::post("/build_info", "IndexController@updateBuildInfo")->middleware("dispatch", "login");
 Route::post("/base_info", "IndexController@updateBaseInfo")->middleware("dispatch", "login");
 Route::get("/export", "IndexController@excel");
+//Route::get("/test/{month}", "IndexController@computerData");

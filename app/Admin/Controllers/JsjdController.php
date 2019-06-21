@@ -178,8 +178,21 @@ class JsjdController extends Controller
             $form->datetime('updated_at',"最近更新时间");
             $form->select("status","状态")->options([0 => "冻结", 1=>"启用"])->default(1);
 
-            $form->text('score',"score")->rules("required|integer")->readOnly();
+            $form->text('score',"score")->default(0)->readOnly();
             $form->datetime('month',"提交的月份")->format("YYYYMM")->rules("required|string");
+
+
+            $form->saving(function (Form $form) {
+                $form->model()->created_time = time();
+                /**
+                 * attention! if we have not set "__isset" function in the class,
+                 * php cannot judge if the attribute existed in the object, or if they are empty.
+                 * empty($form->czwt) -- true
+                 */
+                $czwt = $form->czwt;
+                $form->czwt = empty($czwt) ? "暂无" : strip_tags($czwt);
+
+            });
 
             $form->saved(function (Form $form) {
 

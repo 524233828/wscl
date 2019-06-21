@@ -74,7 +74,6 @@ class IndexController extends BaseController
 
         $company = new Company();
 
-
         $score = $company->getCountyAverageScore();
 
         $score_arr = [];
@@ -87,6 +86,33 @@ class IndexController extends BaseController
                 $item["score"] = $score_arr[$item['id']];
             }else{
                 $item['score'] = 0;
+            }
+        }
+
+        unset($item);
+
+        $current_month = date("Ym");
+
+        $current_month_data = $this->computerData($current_month);
+
+        $last_month = date("Ym", strtotime(date("Y-m-d") . " -1 month"));
+
+        $last_month_data = $this->computerData($last_month);
+
+        $finish_rate_diff = [];
+        foreach ($current_month_data as $county_id => $datum){
+            if(isset($last_month_data[$county_id])){
+                $finish_rate_diff[$county_id] = $datum['finish_rate'] - $last_month_data[$county_id]['finish_rate'];
+            }else{
+                $finish_rate_diff[$county_id] = 0;
+            }
+        }
+
+        foreach ($county as &$item){
+            if(isset($finish_rate_diff[$item['id']])){
+                $item["change_rate"] = $finish_rate_diff[$item['id']];
+            }else{
+                $item['change_rate'] = 0;
             }
         }
 
@@ -564,5 +590,121 @@ class IndexController extends BaseController
             ErrorCode::SYSTEM_ERROR
         );
 
+    }
+
+    public function computerData($month)
+    {
+        if(empty($month)){
+            return false;
+        }
+
+        /**
+         * data格式
+         *
+         * [
+         *  county_id => [
+         *      "county" => ""
+         *      "sum_score" => ""
+         *      "score" => ""
+         *      "finish_rate" => ""
+         *      "rank" => "",
+         *      "companies" => [
+         *          company_id => [
+         *              "name" => ""
+         *              "各项评分" => ""
+         *          ]
+         *      ]
+         *  ]
+         * ]
+         */
+        $data = [];
+
+        //获取市县
+        $counties = County::all(["id", "name"])->toArray();
+
+        foreach($counties as $county)
+        {
+            $data[$county['id']] = [
+                "county" => $county['name'],
+                "sum_score" => 0,
+                "total_score" => 0,
+                "finish_rate" => 0,
+                "rank" => 0,
+                "companies" => [],
+            ];
+        }
+
+        //获取污水厂
+        $companies = Company::all(["id", "name", "county"])->toArray();
+
+        foreach ($companies as $company){
+            $data[$company["county"]]["companies"][$company['id']] = [
+                "name" => $company['name'],
+                "xz" => 0,
+                "zd" => 0,
+                "styp" => 0,
+                "kt" => 0,
+                "gwsg" => 0,
+                "tjsg" => 0,
+                "jdaz" => 0,
+                "syx" => 0,
+                "zsyx" => 0,
+                "jsjd" => 0,
+                "score" => 0,
+            ];
+        }
+
+        //获取月份数据
+        $build_info = BuildInfo::where("month","=" , $month)
+            ->leftJoin("wscl_companies","wscl_jsjd.company_id", "=", "wscl_companies.id")->get();
+        $score = [];
+
+        foreach ($build_info as $item)
+        {
+            $item = $item->toArray();
+            if(isset($score[$item['county']])){
+                $score[$item['county']] += Score::computer($item);
+            }else{
+                $score[$item['county']] = Score::computer($item);
+            }
+
+            $data[$item['county']]["companies"][$item['company_id']]["xz"] = Score::$score_list["xz"][$item['xz']];
+            $data[$item['county']]["companies"][$item['company_id']]["zd"] = Score::$score_list["zd"][$item['zd']];
+            $data[$item['county']]["companies"][$item['company_id']]["styp"] = Score::$score_list["styp"][$item['styp']];
+            $data[$item['county']]["companies"][$item['company_id']]["kt"] = Score::$score_list["kt"][$item['kt']];
+            $data[$item['county']]["companies"][$item['company_id']]["gwsg"] = Score::$score_list["gwsg"][$item['gwsg']];
+            $data[$item['county']]["companies"][$item['company_id']]["tjsg"] = Score::$score_list["tjsg"][$item['tjsg']];
+            $data[$item['county']]["companies"][$item['company_id']]["jdaz"] = Score::$score_list["jdaz"][$item['jdaz']];
+            $data[$item['county']]["companies"][$item['company_id']]["syx"] = Score::$score_list["syx"][$item['syx']];
+            $data[$item['county']]["companies"][$item['company_id']]["zsyx"] = Score::$score_list["zsyx"][$item['zsyx']];
+            $data[$item['county']]["companies"][$item['company_id']]["jsjd"] = Score::$score_list["jsjd"][$item['jsjd']];
+            $data[$item['county']]["companies"][$item['company_id']]["score"] = Score::computer($item);
+            $data[$item['county']]["companies"][$item['company_id']]["czwt"] = isset($item['czwt'])?$item['czwt']:"";
+
+        }
+
+
+
+        foreach ($data as $key => &$datum){
+            if(isset($score[$key])){
+                $datum["sum_score"] = $score[$key];
+            } else{
+                $datum["sum_score"] = 0;
+            }
+            $count = count($datum["companies"]);
+            $datum["total_score"] = $count * 100;
+
+            if($count != 0 ){
+                $datum["finish_rate"] = (float)bcdiv($datum["sum_score"], $count, 2);
+            }else{
+                $datum["finish_rate"] = 0;
+            }
+
+            $data[$key]["companies"] = array_values($data[$key]["companies"]);
+        }
+
+//        $data = array_values($data);
+
+        return $data;
     }
 }
