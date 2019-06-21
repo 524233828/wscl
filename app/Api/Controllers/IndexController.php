@@ -281,113 +281,18 @@ class IndexController extends BaseController
         $time = strtotime($month."01000000");
         $year = date("Y", $time);
         $months = date("m", $time);
-        if(empty($month)){
-            return false;
-        }
 
-        /**
-         * data格式
-         *
-         * [
-         *  county_id => [
-         *      "county" => ""
-         *      "sum_score" => ""
-         *      "score" => ""
-         *      "finish_rate" => ""
-         *      "rank" => "",
-         *      "companies" => [
-         *          company_id => [
-         *              "name" => ""
-         *              "各项评分" => ""
-         *          ]
-         *      ]
-         *  ]
-         * ]
-         */
-        $data = [];
+        //上个月的数据
+        $prev_month = date("Ym", strtotime($month . "01000000 -1 month"));
 
-        //获取市县
-        $counties = County::all(["id", "name"])->toArray();
+        $prev_month_data = $this->computerData($prev_month);
 
-        foreach($counties as $county)
-        {
-            $data[$county['id']] = [
-                "county" => $county['name'],
-                "sum_score" => 0,
-                "total_score" => 0,
-                "finish_rate" => 0,
-                "rank" => 0,
-                "companies" => [],
-            ];
-        }
+        $data = $this->computerData($month);
 
-        //获取污水厂
-        $companies = Company::all(["id", "name", "county"])->toArray();
-
-        foreach ($companies as $company){
-            $data[$company["county"]]["companies"][$company['id']] = [
-                "name" => $company['name'],
-                "xz" => 0,
-                "zd" => 0,
-                "styp" => 0,
-                "kt" => 0,
-                "gwsg" => 0,
-                "tjsg" => 0,
-                "jdaz" => 0,
-                "syx" => 0,
-                "zsyx" => 0,
-                "jsjd" => 0,
-                "score" => 0,
-            ];
-        }
-
-        //获取月份数据
-        $build_info = BuildInfo::where("month","=" , $month)
-            ->leftJoin("wscl_companies","wscl_jsjd.company_id", "=", "wscl_companies.id")->get();
-        $score = [];
-
-        foreach ($build_info as $item)
-        {
-            $item = $item->toArray();
-            if(isset($score[$item['county']])){
-                $score[$item['county']] += Score::computer($item);
-            }else{
-                $score[$item['county']] = Score::computer($item);
+        foreach ($data as $county_id => $datum){
+            if(isset($prev_month_data[$county_id])){
+                $data[$county_id]['change_rate'] = $datum['finish_rate'] - $prev_month_data[$county_id]['finish_rate'];
             }
-
-            $data[$item['county']]["companies"][$item['company_id']]["xz"] = Score::$score_list["xz"][$item['xz']];
-            $data[$item['county']]["companies"][$item['company_id']]["zd"] = Score::$score_list["zd"][$item['zd']];
-            $data[$item['county']]["companies"][$item['company_id']]["styp"] = Score::$score_list["styp"][$item['styp']];
-            $data[$item['county']]["companies"][$item['company_id']]["kt"] = Score::$score_list["kt"][$item['kt']];
-            $data[$item['county']]["companies"][$item['company_id']]["gwsg"] = Score::$score_list["gwsg"][$item['gwsg']];
-            $data[$item['county']]["companies"][$item['company_id']]["tjsg"] = Score::$score_list["tjsg"][$item['tjsg']];
-            $data[$item['county']]["companies"][$item['company_id']]["jdaz"] = Score::$score_list["jdaz"][$item['jdaz']];
-            $data[$item['county']]["companies"][$item['company_id']]["syx"] = Score::$score_list["syx"][$item['syx']];
-            $data[$item['county']]["companies"][$item['company_id']]["zsyx"] = Score::$score_list["zsyx"][$item['zsyx']];
-            $data[$item['county']]["companies"][$item['company_id']]["jsjd"] = Score::$score_list["jsjd"][$item['jsjd']];
-            $data[$item['county']]["companies"][$item['company_id']]["score"] = Score::computer($item);
-            $data[$item['county']]["companies"][$item['company_id']]["czwt"] = isset($item['czwt'])?$item['czwt']:"";
-
-        }
-
-
-
-        foreach ($data as $key => &$datum){
-            if(isset($score[$key])){
-                $datum["sum_score"] = $score[$key];
-            } else{
-                $datum["sum_score"] = 0;
-            }
-            $count = count($datum["companies"]);
-            $datum["total_score"] = $count * 100;
-
-            if($count != 0 ){
-                $datum["finish_rate"] = (float)bcdiv($datum["sum_score"], $count, 2);
-            }else{
-                $datum["finish_rate"] = 0;
-            }
-
-            $data[$key]["companies"] = array_values($data[$key]["companies"]);
         }
 
         $data = array_values($data);
@@ -403,13 +308,13 @@ class IndexController extends BaseController
         try{
             $sheet = $spreadsheet->getActiveSheet();
 
-            $sheet->mergeCells("A1:T1");
+            $sheet->mergeCells("A1:U1");
             $sheet->setCellValue("A1",$title);
-            $sheet->mergeCells("A2:T2");
+            $sheet->mergeCells("A2:U2");
             //表头
             $head = ["序号","县（市、区）","项目名称","管网施工（10分）","选址（10分）","征地（20分）","三通一平（10分）","勘探（10分）",
                 "土建施工（15分）","机电安装（10分）","试运行（10分）","正式运行（5分）","建设进度（-10分）","得分","得分合计","总分",
-                "分值占比","完成率","排名","扣分说明",];
+                "分值占比","完成率","完成率与上月相比","排名","扣分说明",];
 
             $sheet->fromArray($head, null, "A3");
 
@@ -448,13 +353,23 @@ class IndexController extends BaseController
                 $sheet->mergeCells("Q".$row_index.":Q".$to_row_index);
                 $sheet->mergeCells("R".$row_index.":R".$to_row_index);
                 $sheet->mergeCells("S".$row_index.":S".$to_row_index);
+                $sheet->mergeCells("T".$row_index.":T".$to_row_index);
 
                 $sheet->setCellValue("B".$row_index, $datum['county']. "({$count}座)");
                 $sheet->setCellValue("O".$row_index, $datum['sum_score']);
                 $sheet->setCellValue("P".$row_index, $datum['total_score']);
                 $sheet->setCellValue("Q".$row_index, $datum['finish_rate']);
                 $sheet->setCellValue("R".$row_index, $datum['finish_rate']. "%");
-                $sheet->setCellValue("S".$row_index, $datum['rank']);
+                $change_rate = abs($datum['change_rate']);
+                if($datum['change_rate'] > 0){
+                    $sheet->setCellValue("S".$row_index, "↑{$change_rate}%");
+                }else if($datum['change_rate'] == 0){
+                    $sheet->setCellValue("S".$row_index, "-");
+                }else{
+                    $sheet->setCellValue("S".$row_index, "↓{$change_rate}%");
+                }
+
+                $sheet->setCellValue("T".$row_index, $datum['rank']);
 
                 $j = $row_index;//行数
 
@@ -473,7 +388,7 @@ class IndexController extends BaseController
                     $sheet->setCellValue("L".$j, $company['zsyx']);
                     $sheet->setCellValue("M".$j, $company['jsjd']);
                     $sheet->setCellValue("N".$j, $company['score']);
-                    $sheet->setCellValue("T".$j, isset($company['czwt'])?$company['czwt']:"");
+                    $sheet->setCellValue("U".$j, isset($company['czwt'])?$company['czwt']:"");
                     $j++;
                     $k++;
                 }
@@ -629,6 +544,7 @@ class IndexController extends BaseController
                 "sum_score" => 0,
                 "total_score" => 0,
                 "finish_rate" => 0,
+                "change_rate" => 0,
                 "rank" => 0,
                 "companies" => [],
             ];
