@@ -292,7 +292,7 @@ class IndexController extends BaseController
 
         foreach ($data as $county_id => $datum){
             if(isset($prev_month_data[$county_id])){
-                $data[$county_id]['change_rate'] = $datum['finish_rate'] - $prev_month_data[$county_id]['finish_rate'];
+                $data[$county_id]['change_rate'] = bcsub($datum['finish_rate'], $prev_month_data[$county_id]['finish_rate'], 2);
             }
         }
 
