@@ -36,7 +36,7 @@ class Company extends Model
             ->get()->toArray();
     }
 
-    public function county(){
+    public function counties(){
         return $this->belongsTo(County::class, "county");
     }
 
