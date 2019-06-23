@@ -117,7 +117,7 @@ class IndexController extends BaseController
             }
 
             if(
-                isset($current_month_data[$item['id']]['score']) &&
+                isset($current_month_data[$item['id']]['sum_score']) &&
                 isset($current_month_data[$item['id']]['company_count']) &&
                 $current_month_data[$item['id']]['company_count'] != 0
             ){
