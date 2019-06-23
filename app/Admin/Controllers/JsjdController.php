@@ -66,6 +66,8 @@ class JsjdController extends Controller
                 ['text' => '编辑']
             );
 
+
+
             $content->body($this->form()->edit($id));
         });
     }
@@ -190,7 +192,6 @@ class JsjdController extends Controller
             $form->saving(function (Form $form) {
 
                 $id = \Illuminate\Support\Facades\Request::segment(3);
-                var_dump($id);
                 if(empty($id)){//新增
 
                     $build_info = BuildInfo::where([
@@ -235,5 +236,24 @@ class JsjdController extends Controller
             });
 
         });
+    }
+
+    public function update($id)
+    {
+
+        $month = \request()->get("month");
+
+        $company_id = \request()->get("company_id");
+
+        $build_info = BuildInfo::where([
+            ["company_id","=",$company_id],
+            ["month", "=", $month]
+        ])->first();
+
+        if(!empty($build_info)){
+            return $this->form()->update($id);
+        }else{
+            return $this->form()->store();
+        }
     }
 }
