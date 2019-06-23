@@ -28,7 +28,7 @@ class Company extends Model
 
     public function getCountyAverageScoreByMonth($month)
     {
-        DB::table($this->table)
+        return DB::table($this->table)
             ->leftJoin("wscl_jsjd", $this->table.".id", "=", "wscl_jsjd.company_id")
             ->select(DB::raw("county, AVG(wscl_jsjd.score) as score"))
             ->where("month", "=", $month)

@@ -69,12 +69,13 @@ class IndexController extends BaseController
     public function getCounty(Request $request)
     {
         $city_id = $request->get("city_id", "440200");
+        $month = $request->get("month", date("Ym" ));
 
         $county = County::where("city_id", "=", $city_id)->get(["id", "name"])->toArray();
 
         $company = new Company();
 
-        $score = $company->getCountyAverageScore();
+        $score = $company->getCountyAverageScoreByMonth($month);
 
         $score_arr = [];
         foreach ($score as $value){
@@ -91,11 +92,10 @@ class IndexController extends BaseController
 
         unset($item);
 
-        $current_month = date("Ym", strtotime(date("Y-m-d") . " -1 month"));
 
-        $current_month_data = $this->computerData($current_month);
+        $current_month_data = $this->computerData($month);
 
-        $last_month = date("Ym", strtotime(date("Y-m-d") . " -2 month"));
+        $last_month = date("Ym", strtotime($month . "01000000 -1 month"));
 
         $last_month_data = $this->computerData($last_month);
 
