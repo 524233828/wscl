@@ -118,6 +118,8 @@ class JsjdController extends Controller
             $grid->filter(function (Grid\Filter $filter) use ($county){
 
                 $company = Company::getCompany();
+                $county = array_merge([""=>"", $county]);
+                $company = array_merge([""=>"", $company]);
                 $filter->equal("company_id","污水厂")->select($company);
                 $filter->equal("company.county","县（市、区）")->select($county);
                 $filter->where(function (Builder $query){
