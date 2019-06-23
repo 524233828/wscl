@@ -115,6 +115,19 @@ class IndexController extends BaseController
             }else{
                 $item['change_rate'] = 0;
             }
+
+            if(
+                isset($current_month_data[$item['id']]['score']) &&
+                isset($current_month_data[$item['id']]['company_count']) &&
+                $current_month_data[$item['id']]['company_count'] != 0
+            ){
+                $item['score'] = bcdiv(
+                    $current_month_data[$item['id']]['score'] ,
+                    $current_month_data[$item['id']]['company_count'],
+                    0
+                );
+            }
+
         }
 
         return $this->response($county);
@@ -610,6 +623,7 @@ class IndexController extends BaseController
             }
             $count = count($datum["companies"]);
             $datum["total_score"] = $count * 100;
+            $datum['company_count'] = $count;
 
             if($count != 0 ){
                 $datum["finish_rate"] = (float)bcdiv($datum["sum_score"], $count, 2);

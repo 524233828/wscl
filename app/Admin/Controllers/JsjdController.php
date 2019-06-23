@@ -118,10 +118,9 @@ class JsjdController extends Controller
             $grid->filter(function (Grid\Filter $filter) use ($county){
 
                 $company = Company::getCompany();
-                $county = array_merge([""=>"", $county]);
-                $company = array_merge([""=>"", $company]);
-                $filter->equal("company_id","污水厂")->select($company);
-                $filter->equal("company.county","县（市、区）")->select($county);
+//                $company = array_merge([""=>"", $company]);
+                $filter->in("company_id","污水厂")->multipleSelect($company);
+                $filter->in("company.county","县（市、区）")->multipleSelect($county);
                 $filter->where(function (Builder $query){
                     $query->where("month", "=", $this->input);
                 },"提交的月份","month")->datetime(['format' => 'YYYYMM']);
