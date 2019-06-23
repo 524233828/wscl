@@ -102,7 +102,7 @@ class IndexController extends BaseController
         $finish_rate_diff = [];
         foreach ($current_month_data as $county_id => $datum){
             if(isset($last_month_data[$county_id])){
-                $finish_rate_diff[$county_id] = bcdiv($datum['finish_rate'] , $last_month_data[$county_id]['finish_rate'], 2);
+                $finish_rate_diff[$county_id] = bcmod($datum['finish_rate'],  $last_month_data[$county_id]['finish_rate'], 2) ;
             }else{
                 $finish_rate_diff[$county_id] = 0;
             }
