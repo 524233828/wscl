@@ -19,6 +19,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use http\Env\Request;
 use Illuminate\Database\Eloquent\Builder;
 
 class JsjdController extends Controller
@@ -183,6 +184,20 @@ class JsjdController extends Controller
 
 
             $form->saving(function (Form $form) {
+
+                $id = \Illuminate\Support\Facades\Request::segment(3);
+                var_dump($id);
+                if(empty($id)){//新增
+
+                    $build_info = BuildInfo::where([
+                        ["company_id","=",$form->company_id],
+                        ["month", "=", $form->month]
+                    ])->first();
+
+                    if(!empty($build_info)){
+                        throw new \Exception("该厂本月进度已提交，如需提交本月新进度，请修改已提交进度", 0);
+                    }
+                }
                 $form->model()->created_time = time();
                 /**
                  * attention! if we have not set "__isset" function in the class,
