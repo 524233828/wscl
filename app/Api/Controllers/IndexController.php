@@ -122,7 +122,7 @@ class IndexController extends BaseController
                 $current_month_data[$item['id']]['company_count'] != 0
             ){
                 $item['score'] = bcdiv(
-                    $current_month_data[$item['id']]['score'] ,
+                    $current_month_data[$item['id']]['sum_score'] ,
                     $current_month_data[$item['id']]['company_count'],
                     0
                 );
