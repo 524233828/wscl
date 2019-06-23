@@ -631,7 +631,7 @@ class IndexController extends BaseController
                 $datum["finish_rate"] = 0;
             }
 
-            $datum[$key]["companies"] = array_values($data[$key]["companies"]);
+            $data[$key]["companies"] = array_values($data[$key]["companies"]);
         }
 
 //        $data = array_values($data);
