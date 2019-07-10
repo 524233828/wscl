@@ -71,6 +71,8 @@ class IndexController extends BaseController
         $city_id = $request->get("city_id", "440200");
         $month = $request->get("month", date("Ym" ));
 
+        $month = BuildInfo::max("month");
+
         $county = County::where("city_id", "=", $city_id)->get(["id", "name"])->toArray();
 
         $company = new Company();
