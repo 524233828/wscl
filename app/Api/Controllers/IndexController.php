@@ -69,7 +69,7 @@ class IndexController extends BaseController
     public function getCounty(Request $request)
     {
         $city_id = $request->get("city_id", "440200");
-        $month = $request->get("month", date("Ym" ));
+//        $month = $request->get("month", date("Ym" ));
 
         $month = BuildInfo::max("month");
 

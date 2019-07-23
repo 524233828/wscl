@@ -100,7 +100,8 @@ class JsjdController extends Controller
         return Admin::grid(BuildInfo::class, function (Grid $grid) {
 
             $county = County::getCounty();
-            $grid->column("id","ID");
+            $grid->model()->orderBy('id', 'desc');
+            $grid->column("id","ID")->sortable();
             $grid->column("company.county","县（市、区）")->display(function ($value) use ($county){
                 return $county[$value];
             })->sortable();
