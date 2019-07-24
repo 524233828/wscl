@@ -18,6 +18,7 @@ use App\Models\BuildInfo;
 use App\Models\Company;
 use App\Models\County;
 use App\Models\ScoreItem;
+use App\Services\County\Score\NewestCompanyScore;
 use App\User;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -69,20 +70,26 @@ class IndexController extends BaseController
     public function getCounty(Request $request)
     {
         $city_id = $request->get("city_id", "440200");
-//        $month = $request->get("month", date("Ym" ));
+        $month = $request->get("month", date("Ym" ));
 
-        $month = BuildInfo::max("month");
+//        $month = BuildInfo::max("month");
 
         $county = County::where("city_id", "=", $city_id)->get(["id", "name"])->toArray();
 
-        $company = new Company();
-
-        $score = $company->getCountyAverageScoreByMonth($month);
-
-        $score_arr = [];
-        foreach ($score as $value){
-            $score_arr[$value->county] = floor($value->score);
+//        var_dump(date("Ym" ));
+//        var_dump($month > date("Ym" ));exit;
+        if($month > date("Ym" )){
+            $score_arr = [];
+        }else{
+            $score_arr = NewestCompanyScore::get($month);
         }
+
+//        $score = $company->getCountyAverageScoreByMonth($month);
+//
+//        $score_arr = [];
+//        foreach ($score as $value){
+//            $score_arr[$value->county] = floor($value->score);
+//        }
 
         foreach ($county as &$item){
             if(isset($score_arr[$item['id']])){
@@ -95,42 +102,42 @@ class IndexController extends BaseController
         unset($item);
 
 
-        $current_month_data = $this->computerData($month);
-
-        $last_month = date("Ym", strtotime($month . "01000000 -1 month"));
-
-        $last_month_data = $this->computerData($last_month);
-
-        $finish_rate_diff = [];
-        foreach ($current_month_data as $county_id => $datum){
-            if(isset($last_month_data[$county_id])){
-                $finish_rate_diff[$county_id] = bcsub($datum['finish_rate'], $last_month_data[$county_id]['finish_rate'], 2) ;
-//                $finish_rate_diff[$county_id] = intval($finish_rate_diff * 100) / 100;
-            }else{
-                $finish_rate_diff[$county_id] = 0;
-            }
-        }
-
-        foreach ($county as &$item){
-            if(isset($finish_rate_diff[$item['id']])){
-                $item["change_rate"] = $finish_rate_diff[$item['id']];
-            }else{
-                $item['change_rate'] = 0;
-            }
-
-            if(
-                isset($current_month_data[$item['id']]['sum_score']) &&
-                isset($current_month_data[$item['id']]['company_count']) &&
-                $current_month_data[$item['id']]['company_count'] != 0
-            ){
-                $item['score'] = bcdiv(
-                    $current_month_data[$item['id']]['sum_score'] ,
-                    $current_month_data[$item['id']]['company_count'],
-                    0
-                );
-            }
-
-        }
+//        $current_month_data = $this->computerData($month);
+//
+//        $last_month = date("Ym", strtotime($month . "01000000 -1 month"));
+//
+//        $last_month_data = $this->computerData($last_month);
+//
+//        $finish_rate_diff = [];
+//        foreach ($current_month_data as $county_id => $datum){
+//            if(isset($last_month_data[$county_id])){
+//                $finish_rate_diff[$county_id] = bcsub($datum['finish_rate'], $last_month_data[$county_id]['finish_rate'], 2) ;
+////                $finish_rate_diff[$county_id] = intval($finish_rate_diff * 100) / 100;
+//            }else{
+//                $finish_rate_diff[$county_id] = 0;
+//            }
+//        }
+//
+//        foreach ($county as &$item){
+//            if(isset($finish_rate_diff[$item['id']])){
+//                $item["change_rate"] = $finish_rate_diff[$item['id']];
+//            }else{
+//                $item['change_rate'] = 0;
+//            }
+//
+//            if(
+//                isset($current_month_data[$item['id']]['sum_score']) &&
+//                isset($current_month_data[$item['id']]['company_count']) &&
+//                $current_month_data[$item['id']]['company_count'] != 0
+//            ){
+//                $item['score'] = bcdiv(
+//                    $current_month_data[$item['id']]['sum_score'] ,
+//                    $current_month_data[$item['id']]['company_count'],
+//                    0
+//                );
+//            }
+//
+//        }
 
         return $this->response($county);
     }
